@@ -102,11 +102,11 @@ export class Piece {
               //Quer mover reto
               if (tabuleiro[i][j].codigoPeca == tabuleiro[i][j].nomePeca) {
                 //Não tem peça na frente e foi movida 1 casa
-                if(pecaEscolhida.cor == "B" && i-iToMove == -1){
+                if (pecaEscolhida.cor == "B" && i - iToMove == -1) {
                   //Quer voltar uma casa
                   return false;
                 }
-                if(pecaEscolhida.cor == "N" && i-iToMove == +1){
+                if (pecaEscolhida.cor == "N" && i - iToMove == +1) {
                   //Quer voltar uma casa
                   return false;
                 }
@@ -117,21 +117,21 @@ export class Piece {
               //Quer mover na diagonal
               if (pecaEscolhida.enPassant && pecaEscolhida.enPassantMove[0] == i && pecaEscolhida.enPassantMove[1] == j) {
                 //En Passant
-                if(pecaEscolhida.cor == "B"){
-                  tabuleiro[i-1][j] = new Piece();
+                if (pecaEscolhida.cor == "B") {
+                  tabuleiro[i - 1][j] = new Piece();
                 }
-                if(pecaEscolhida.cor == "N"){
-                  tabuleiro[i+1][j] = new Piece();
+                if (pecaEscolhida.cor == "N") {
+                  tabuleiro[i + 1][j] = new Piece();
                 }
                 return true;
               }
               if (pecaEscolhida.cor != tabuleiro[i][j].cor && tabuleiro[i][j].cor != null) {
                 //Quer realizar uma captura
-                if(pecaEscolhida.cor == "B" && i-iToMove == -1){
+                if (pecaEscolhida.cor == "B" && i - iToMove == -1) {
                   //Quer voltar uma casa
                   return false;
                 }
-                if(pecaEscolhida.cor == "N" && i-iToMove == +1){
+                if (pecaEscolhida.cor == "N" && i - iToMove == +1) {
                   //Quer voltar uma casa
                   return false;
                 }
@@ -152,11 +152,16 @@ export class Piece {
       case "C":
         return ((Math.abs(Math.abs(i) - Math.abs(iToMove)) == 2 && Math.abs(Math.abs(j) - Math.abs(jToMove)) == 1) || (Math.abs(Math.abs(i) - Math.abs(iToMove)) == 1 && Math.abs(Math.abs(j) - Math.abs(jToMove)) == 2))
       case "B":
-        console.log(Math.abs(i/iToMove) , Math.abs(j/jToMove))
-        if(Math.abs(i/iToMove) == Math.abs(j/jToMove)){
-          return this.bispoMove(i,j,iToMove,jToMove,tabuleiro);
+        if (Math.abs(i - iToMove) == Math.abs(j - jToMove)) {
+          this.bispoMove(i, j, iToMove, jToMove, tabuleiro).then(value => {
+            console.log("OI")
+            return value;
+          }).catch(value => {
+            console.log("OI2")
+            return value;
+          })
         }
-        else{
+        else {
           return false;
         }
       case "T":
@@ -172,45 +177,52 @@ export class Piece {
     return false;
   }
 
-  private static bispoMove(i: number, j: number, iToMove: number, jToMove: number, tabuleiro: Piece[][]):boolean {
-    let tevePecaNoCaminho = false;
-    let singI = i/iToMove / Math.abs(i/iToMove);
-    let singJ = j/jToMove / Math.abs(j/jToMove);
-    for(let count = 1; count <= Math.abs(j/jToMove); count ++){
-       console.log(iToMove+(singI*count),jToMove+(singJ*count))
-      if(tabuleiro[iToMove+(singI*count)][jToMove+(singJ*count)].cor != null){
-        tevePecaNoCaminho = true;
+  private static promiseBispoMove(i: number, iToMove: number, jToMove: number, tabuleiro: Piece[][], singI: any, singJ: any): Promise<null> {
+    return new Promise((resolve, reject) => {
+      resolve();
+    });
+  }
+
+  private static bispoMove(i: number, j: number, iToMove: number, jToMove: number, tabuleiro: Piece[][]): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      let singI = (i - iToMove) / Math.abs(i - iToMove);
+      let singJ = (j - jToMove) / Math.abs(j - jToMove);
+      for (let count = 1; count <= Math.abs(i - iToMove); count++) {
+        console.log(iToMove + (count * singI), jToMove + (count * singJ))
+        if (tabuleiro[iToMove + (count * singI)][jToMove + (count * singJ)].codigoPeca != null) {
+          reject(false);
+        }
       }
-    }
-    return !tevePecaNoCaminho;
+      resolve(true);
+    })
   }
 
   static preencheEnPassant(i: number, j: number, iToMove: number, jToMove: number, tabuleiro: Piece[][]) {
     if (!this.validaSaiuTabuleiro(i, j + 1) && tabuleiro[iToMove][jToMove].cor != tabuleiro[i][j + 1].cor) {
       tabuleiro[i][j + 1].enPassant = true;
-      if(tabuleiro[iToMove][jToMove].cor == "B"){
+      if (tabuleiro[iToMove][jToMove].cor == "B") {
         //Quem pode realizar o enPassant é as negas
-        tabuleiro[i][j+1].enPassantMove.push(i-1,j);
+        tabuleiro[i][j + 1].enPassantMove.push(i - 1, j);
       }
-      else{
+      else {
         //Quem pode realizar o enPassant é as brancas
-        tabuleiro[i][j+1].enPassantMove.push(i+1,j);
+        tabuleiro[i][j + 1].enPassantMove.push(i + 1, j);
       }
     }
     if (!this.validaSaiuTabuleiro(i, j - 1) && tabuleiro[iToMove][jToMove].cor != tabuleiro[i][j - 1].cor) {
       tabuleiro[i][j - 1].enPassant = true;
-      if(tabuleiro[iToMove][jToMove].cor == "B"){
+      if (tabuleiro[iToMove][jToMove].cor == "B") {
         //Quem pode realizar o enPassant é as negas
-        tabuleiro[i][j-1].enPassantMove.push(i-1,j);
+        tabuleiro[i][j - 1].enPassantMove.push(i - 1, j);
       }
-      else{
+      else {
         //Quem pode realizar o enPassant é as brancas
-        tabuleiro[i][j-1].enPassantMove.push(i+1,j);
+        tabuleiro[i][j - 1].enPassantMove.push(i + 1, j);
       }
     }
   }
 
-  private static validaSaiuTabuleiro(i, j): boolean {
+  private static validaSaiuTabuleiro(i: number, j: number): boolean {
     /* i-> Linha // j-> Coluna */
     if (i > 7 || i < 0) {
       return true;
