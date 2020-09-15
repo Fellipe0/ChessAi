@@ -1,4 +1,5 @@
 import { Component, OnInit, Pipe } from '@angular/core';
+import { Moviment } from './moviment.service';
 import { Piece } from './Piece';
 
 //declare var ChessBoard:any;
@@ -19,7 +20,7 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.criarTabuleiro()
       .then(() => {
-        Piece.posInicialPiece(this.tabuleiro).then(tabuleiroFim => {
+        Moviment.posInicialPiece(this.tabuleiro).then(tabuleiroFim => {
           this.tabuleiro = tabuleiroFim;
         })
       });
@@ -38,8 +39,8 @@ export class AppComponent implements OnInit {
           return;
         }
         else {
-          if(Piece.movimentValidWithExceptions(i,j,this.iToMov,this.jToMov,this.tabuleiro)){
-            this.move(i,j);
+          if (Moviment.movimentValidWithExceptions(i, j, this.iToMov, this.jToMov, this.tabuleiro)) {
+            this.move(i, j);
           }
         }
       }
@@ -50,20 +51,21 @@ export class AppComponent implements OnInit {
   }
 
   /*--- PRIVATE ---*/
-  private move(i,j){
+  private move(i, j) {
     this.unselected(this.iToMov, this.jToMov);
     this.lastMoveColor = this.tabuleiro[this.iToMov][this.jToMov].cor;
-
+    
     this.tabuleiro[i][j] = this.tabuleiro[this.iToMov][this.jToMov];
     this.tabuleiro[this.iToMov][this.jToMov] = new Piece();
+    this.tabuleiro[i][j].foiMovida = true;
 
     this.afterMoveReset();
   }
 
-  private afterMoveReset(){
-    for(let i = 0; i < 8; i++){
-      for(let j = 0; j < 8; j++){
-        if(this.tabuleiro[i][j].cor == this.lastMoveColor){
+  private afterMoveReset() {
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        if (this.tabuleiro[i][j].cor == this.lastMoveColor) {
           this.tabuleiro[i][j].enPassantMove = new Array();
           this.tabuleiro[i][j].enPassant = false;
         }
