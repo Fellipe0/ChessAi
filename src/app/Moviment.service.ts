@@ -177,8 +177,8 @@ export class Moviment {
 
         //    i = Destino Linha
         //    j = Destino Coluna
-        //    iToMove = Destino Linha
-        //    jToMove = Destino Coluna
+        //    iToMove = Origem Linha
+        //    jToMove = Origem Coluna
 
         let pecaEscolhida: Piece = tabuleiro[iToMove][jToMove];
 
