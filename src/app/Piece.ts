@@ -1,5 +1,3 @@
-import { defaultKeyValueDiffers } from '@angular/core/src/change_detection/change_detection';
-
 export class Piece {
   /*Referente a todas as peças*/
   public nomePeca: string;
